@@ -10,6 +10,11 @@ from agentic_nomina.service import run_baseline
 app = typer.Typer(help="Agentic Nomina reconciliation baseline.")
 
 
+@app.callback()
+def main() -> None:
+    """Run Agentic Nomina commands."""
+
+
 @app.command("reconcile")
 def reconcile(
     payroll_q1: Path = typer.Option(..., exists=True, help="First payroll period Excel file."),
