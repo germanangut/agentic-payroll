@@ -21,3 +21,15 @@ def test_employee_reconciliation_classifies_missing_and_extra() -> None:
     assert result.at["1", "severity"] == "OK"
     assert result.at["2", "severity"] == "WARNING"
     assert result.at["3", "severity"] == "BLOCKING"
+
+
+def test_employee_reconciliation_accepts_source_name_truncation() -> None:
+    employee_list = pd.DataFrame(
+        [{"employee_id": "1", "employee_name": "RODRIGUEZ GUTIERREZ KARLA ALEJANDRA", "employee_status": "E"}]
+    )
+    payroll = pd.DataFrame(
+        [{"employee_id": "1", "employee_name": "RODRIGUEZ GUTIERREZ KARLA ALEJ"}]
+    )
+    result = reconcile_employees(employee_list, payroll).iloc[0]
+    assert result["severity"] == "OK"
+    assert result["outcome"] == "MATCHED"

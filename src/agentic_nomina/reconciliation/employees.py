@@ -6,6 +6,15 @@ from agentic_nomina.models import Severity
 from agentic_nomina.utils import canonical_text
 
 
+def _names_equivalent(left: str, right: str) -> bool:
+    """Accept exact names and source-system truncation of the same normalized name."""
+    a = canonical_text(left)
+    b = canonical_text(right)
+    if not a or not b:
+        return False
+    return a == b or (min(len(a), len(b)) >= 12 and (a.startswith(b) or b.startswith(a)))
+
+
 def reconcile_employees(employee_list: pd.DataFrame, payroll: pd.DataFrame) -> pd.DataFrame:
     listed = employee_list.drop_duplicates("employee_id").set_index("employee_id")
     paid = payroll.drop_duplicates("employee_id").set_index("employee_id")
@@ -20,7 +29,7 @@ def reconcile_employees(employee_list: pd.DataFrame, payroll: pd.DataFrame) -> p
         status = str(listed.at[employee_id, "employee_status"]) if in_list else ""
 
         if in_list and in_payroll:
-            names_match = canonical_text(list_name) == canonical_text(payroll_name)
+            names_match = _names_equivalent(list_name, payroll_name)
             severity = Severity.OK if names_match else Severity.WARNING
             outcome = "MATCHED" if names_match else "NAME_MISMATCH"
         elif in_list:
