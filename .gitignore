@@ -1,0 +1,27 @@
+# Client and generated data — never commit
+/data/raw/**
+/data/processed/**
+!/data/raw/.gitkeep
+!/data/processed/.gitkeep
+*.pdf
+*.xlsx
+*.xls
+*.csv
+
+# Secrets and local environments
+.env
+.env.*
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
