@@ -25,10 +25,10 @@ def test_employee_reconciliation_classifies_missing_and_extra() -> None:
 
 def test_employee_reconciliation_accepts_source_name_truncation() -> None:
     employee_list = pd.DataFrame(
-        [{"employee_id": "1", "employee_name": "RODRIGUEZ GUTIERREZ KARLA ALEJANDRA", "employee_status": "E"}]
+        [{"employee_id": "1", "employee_name": "PERSONA PRUEBA NOMBRE COMPLETO", "employee_status": "E"}]
     )
     payroll = pd.DataFrame(
-        [{"employee_id": "1", "employee_name": "RODRIGUEZ GUTIERREZ KARLA ALEJ"}]
+        [{"employee_id": "1", "employee_name": "PERSONA PRUEBA NOMBRE COM"}]
     )
     result = reconcile_employees(employee_list, payroll).iloc[0]
     assert result["severity"] == "OK"

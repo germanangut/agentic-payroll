@@ -16,6 +16,7 @@ payroll:
     night_surcharge: "RECARGO NOCTURNO"
     los_olivos: "LOS OLIVOS SEGURO"
     comfatolima: "COMFATOLIMA PREST"
+    loan: "PRESTAMOS Y/O ANT"
 
 employee_list:
   sheet_name: "Hoja1"
@@ -98,3 +99,17 @@ external_deductions:
     payroll_field: "comfatolima_value"
     period_label: "MONTH"
     expected_month: "FEB2026"
+
+loans:
+  rules:
+    rule_id: "employee_loan_balance_movement"
+    rule_version: "1.0"
+    rule_status: "provisional"
+    monetary_tolerance: 0
+  reports:
+    q1:
+      expected_reported_total: 3829379
+      expected_debit_total: 900000
+    q2:
+      expected_reported_total: 3503397
+      expected_debit_total: 700000

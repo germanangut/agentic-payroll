@@ -54,6 +54,14 @@ def reconcile(
         Path | None,
         typer.Option(exists=True, help="Monthly Comfatolima credit report PDF."),
     ] = None,
+    loans_q1: Annotated[
+        Path | None,
+        typer.Option(exists=True, help="First-period Siigo employee-loan balance PDF."),
+    ] = None,
+    loans_q2: Annotated[
+        Path | None,
+        typer.Option(exists=True, help="Second-period Siigo employee-loan balance PDF."),
+    ] = None,
     output: Annotated[Path, typer.Option()] = Path("data/processed/reconciliation.xlsx"),
     config_path: Annotated[Path, typer.Option("--config")] = Path("config/baseline.yml"),
 ) -> None:
@@ -68,6 +76,8 @@ def reconcile(
         overtime_q2_path=overtime_q2,
         los_olivos_path=los_olivos,
         comfatolima_path=comfatolima,
+        loans_q1_path=loans_q1,
+        loans_q2_path=loans_q2,
         output_path=output,
         config=config,
     )
@@ -81,6 +91,8 @@ def reconcile(
         typer.echo(f"Los Olivos employee controls: {len(results['los_olivos'])}")
     if "comfatolima" in results:
         typer.echo(f"Comfatolima employee controls: {len(results['comfatolima'])}")
+    if "loans" in results:
+        typer.echo(f"Employee-loan balance controls: {len(results['loans'])}")
 
 
 if __name__ == "__main__":

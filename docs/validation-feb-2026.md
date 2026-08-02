@@ -72,3 +72,31 @@ Comfatolima credit report, then compared with the second-period Siigo payroll ex
 - 1 active employee was `REVIEW` because the expected COP 188,294 deduction was zero in payroll.
 
 These classifications are evidence for review, not approved payroll corrections.
+
+
+## Employee-loan balance validation
+
+The two Siigo loan balance PDFs were parsed locally and compared with the `PRESTAMOS Y/O ANT`
+payroll deductions.
+
+### First period
+
+- 10 employee loan balances were extracted.
+- Reported balance total before the payroll reduction: COP 3,829,379.
+- New loan debits within the report: COP 900,000.
+- Next-report opening balances for those loans: COP 2,803,397.
+- Expected reduction by balance movement: COP 1,025,982.
+- Payroll deductions: COP 1,025,982.
+- 10 exact `OK` matches and no exceptions.
+
+### Second period
+
+- 12 employee loan balances were extracted.
+- Reported balance total: COP 3,503,397.
+- New loan debits within the report: COP 700,000.
+- Payroll deductions: COP 857,836.
+- Projected post-payroll balance: COP 2,645,561.
+- All 12 records are `WARNING` with `PENDING_NEXT_CUTOFF` because a March opening-balance report is required to validate the movement.
+
+The balance movement is a provisional interpretation of the Siigo reports. It requires confirmation
+from payroll/accounting before the rule lifecycle can move from `PROVISIONAL` to `VALIDATED`.
