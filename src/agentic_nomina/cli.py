@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Annotated
 
 import typer
 
@@ -17,13 +18,28 @@ def main() -> None:
 
 @app.command("reconcile")
 def reconcile(
-    payroll_q1: Path = typer.Option(..., exists=True, help="First payroll period Excel file."),
-    payroll_q2: Path = typer.Option(..., exists=True, help="Second payroll period Excel file."),
-    employees_q1: Path = typer.Option(..., exists=True, help="First employee list Excel file."),
-    employees_q2: Path = typer.Option(..., exists=True, help="Second employee list Excel file."),
-    pila: Path = typer.Option(..., exists=True, help="Monthly PILA Excel file."),
-    output: Path = typer.Option(Path("data/processed/reconciliation.xlsx")),
-    config_path: Path = typer.Option(Path("config/baseline.yml"), "--config"),
+    payroll_q1: Annotated[
+        Path,
+        typer.Option(exists=True, help="First payroll period Excel file."),
+    ],
+    payroll_q2: Annotated[
+        Path,
+        typer.Option(exists=True, help="Second payroll period Excel file."),
+    ],
+    employees_q1: Annotated[
+        Path,
+        typer.Option(exists=True, help="First employee list Excel file."),
+    ],
+    employees_q2: Annotated[
+        Path,
+        typer.Option(exists=True, help="Second employee list Excel file."),
+    ],
+    pila: Annotated[
+        Path,
+        typer.Option(exists=True, help="Monthly PILA Excel file."),
+    ],
+    output: Annotated[Path, typer.Option()] = Path("data/processed/reconciliation.xlsx"),
+    config_path: Annotated[Path, typer.Option("--config")] = Path("config/baseline.yml"),
 ) -> None:
     config = load_config(config_path)
     results = run_baseline(

@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import re
 import unicodedata
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
 import pandas as pd
@@ -50,7 +50,7 @@ def numeric(value: Any) -> float:
 
 def round_money(value: float, unit: int = 100) -> float:
     if unit <= 1:
-        return float(Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+        return float(Decimal(str(value)).quantize(Decimal(1), rounding=ROUND_HALF_UP))
     units = Decimal(str(value)) / Decimal(unit)
-    rounded = units.quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+    rounded = units.quantize(Decimal(1), rounding=ROUND_HALF_UP)
     return float(rounded * Decimal(unit))
