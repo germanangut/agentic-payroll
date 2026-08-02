@@ -62,6 +62,13 @@ def reconcile(
         Path | None,
         typer.Option(exists=True, help="Second-period Siigo employee-loan balance PDF."),
     ] = None,
+    reviews: Annotated[
+        Path | None,
+        typer.Option(
+            exists=True,
+            help="Previous reconciliation workbook or CSV with human review decisions.",
+        ),
+    ] = None,
     output: Annotated[Path, typer.Option()] = Path("data/processed/reconciliation.xlsx"),
     config_path: Annotated[Path, typer.Option("--config")] = Path("config/baseline.yml"),
 ) -> None:
@@ -78,6 +85,7 @@ def reconcile(
         comfatolima_path=comfatolima,
         loans_q1_path=loans_q1,
         loans_q2_path=loans_q2,
+        reviews_path=reviews,
         output_path=output,
         config=config,
     )

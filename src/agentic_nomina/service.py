@@ -17,6 +17,7 @@ from agentic_nomina.reconciliation.loans import reconcile_loan_balances
 from agentic_nomina.reconciliation.overtime import reconcile_overtime
 from agentic_nomina.reconciliation.social_security import reconcile_social_security
 from agentic_nomina.reporting.excel import write_report
+from agentic_nomina.reporting.reviews import load_review_ledger
 
 
 def run_baseline(
@@ -34,6 +35,7 @@ def run_baseline(
     comfatolima_path: str | Path | None = None,
     loans_q1_path: str | Path | None = None,
     loans_q2_path: str | Path | None = None,
+    reviews_path: str | Path | None = None,
 ) -> dict[str, pd.DataFrame]:
     payroll_q1 = load_payroll(payroll_q1_path, config["payroll"], "Q1")
     payroll_q2 = load_payroll(payroll_q2_path, config["payroll"], "Q2")
@@ -107,6 +109,7 @@ def run_baseline(
             ]
         )
 
+    reviews = load_review_ledger(reviews_path) if reviews_path is not None else None
     write_report(
         output_path,
         employee_results,
@@ -114,6 +117,7 @@ def run_baseline(
         overtime,
         external_deductions,
         loans,
+        reviews,
     )
     results = {**employee_results, "social_security": social, **external_deductions}
     if overtime is not None:

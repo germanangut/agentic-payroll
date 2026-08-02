@@ -15,6 +15,7 @@ The baseline reconciles:
 - configurable provisional caps, lower bounds, tolerances and rule versions;
 - missing, additional and name-mismatched employees;
 - an Excel review workbook with summary, detailed controls and a normalized exception registry.
+- a human review ledger that preserves auditable decisions across reconciliation runs.
 
 The engine is deterministic. AI is intentionally excluded from financial calculations and
 approvals.
@@ -51,10 +52,21 @@ agentic-nomina reconcile \
   --comfatolima "data/raw/NOVEDADES AGREGADOS NACIONALES FEBRERO 2026..pdf" \
   --loans-q1 "data/raw/PRESTAMO FEBRERO 2026.pdf" \
   --loans-q2 "data/raw/PRESTAMOS 2DA QUINCENA FEBRERO 2026.pdf" \
+  --reviews "data/processed/reconciliation-feb-2026-previous.xlsx" \
   --output "data/processed/reconciliation-feb-2026.xlsx"
 ```
 
-The overtime options and employee-loan report options are optional pairs: when one file in a pair is supplied, the other is required. Provider PDFs can be supplied independently.
+The overtime options and employee-loan report options are optional pairs: when one file in a pair is supplied, the other is required. Provider PDFs can be supplied independently. `--reviews` is optional and accepts a prior report or a CSV ledger.
+
+## Human review workflow
+
+- Every exception receives a deterministic `exception_id` based on its material facts.
+- The `Revisiones` sheet is the editable human decision ledger; deterministic calculation sheets remain unchanged.
+- Review statuses are `PENDIENTE`, `EN_REVISION`, `RESUELTO` and `ESCALADO`.
+- Decisions are `CONFIRMADO`, `FALSO_POSITIVO` and `CORRECCION_REQUERIDA`.
+- A resolved item requires a decision, reviewer and review date.
+- If a finding changes materially, it receives a new identifier and returns to `PENDIENTE`.
+- A stale or unknown identifier blocks the run instead of silently transferring an old approval.
 
 ## Overtime rule semantics
 
@@ -94,7 +106,6 @@ The overtime options and employee-loan report options are optional pairs: when o
 
 ## Next increments
 
-1. Add a human review and approval workflow.
-2. Validate provisional rules incrementally with payroll/accounting owners.
-3. Add incapacity and permission evidence.
-4. Add the first review interface and validate reusability with a second payroll month.
+1. Validate provisional rules incrementally with payroll/accounting owners.
+2. Add incapacity and permission evidence.
+3. Add the first review interface and validate reusability with a second payroll month.
