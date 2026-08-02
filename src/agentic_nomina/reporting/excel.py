@@ -9,6 +9,7 @@ def _summary_frame(
     employee_results: dict[str, pd.DataFrame],
     social: pd.DataFrame,
     overtime: pd.DataFrame | None,
+    external_deductions: dict[str, pd.DataFrame] | None,
 ) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
     for label, frame in employee_results.items():
@@ -44,6 +45,18 @@ def _summary_frame(
             {
                 "module": "Overtime controls",
                 "total": len(overtime_statuses),
+                "ok": counts.get("OK", 0),
+                "warning": counts.get("WARNING", 0),
+                "review": counts.get("REVIEW", 0),
+                "blocking": counts.get("BLOCKING", 0),
+            }
+        )
+    for label, frame in (external_deductions or {}).items():
+        counts = frame["severity"].value_counts().to_dict()
+        rows.append(
+            {
+                "module": f"External deduction: {label}",
+                "total": len(frame),
                 "ok": counts.get("OK", 0),
                 "warning": counts.get("WARNING", 0),
                 "review": counts.get("REVIEW", 0),
@@ -147,13 +160,48 @@ def _overtime_exceptions(overtime: pd.DataFrame) -> list[dict[str, object]]:
     return rows
 
 
+def _external_deduction_exceptions(
+    external_deductions: dict[str, pd.DataFrame],
+) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for frame in external_deductions.values():
+        for record in frame.to_dict(orient="records"):
+            if record.get("severity") == "OK":
+                continue
+            rows.append(
+                {
+                    "module": str(record.get("provider") or "EXTERNAL_DEDUCTION"),
+                    "period_label": record.get("period_label"),
+                    "employee_id": record.get("employee_id"),
+                    "employee_name": record.get("employee_name_source")
+                    or record.get("employee_name_payroll"),
+                    "control": "monthly_deduction",
+                    "expected_value": record.get("expected_value"),
+                    "actual_value": record.get("actual_value"),
+                    "difference": record.get("difference"),
+                    "severity": record.get("severity"),
+                    "rule_id": record.get("rule_id"),
+                    "rule_version": record.get("rule_version"),
+                    "rule_status": record.get("rule_status"),
+                    "source_file": record.get("source_file"),
+                    "source_sheet": None,
+                    "source_row": record.get("source_row"),
+                    "notes": record.get("notes"),
+                }
+            )
+    return rows
+
+
 def _exception_frame(
     social: pd.DataFrame,
     overtime: pd.DataFrame | None,
+    external_deductions: dict[str, pd.DataFrame] | None,
 ) -> pd.DataFrame:
     rows = _social_exceptions(social)
     if overtime is not None:
         rows.extend(_overtime_exceptions(overtime))
+    if external_deductions:
+        rows.extend(_external_deduction_exceptions(external_deductions))
     columns = [
         "module",
         "period_label",
@@ -180,11 +228,12 @@ def write_report(
     employee_results: dict[str, pd.DataFrame],
     social: pd.DataFrame,
     overtime: pd.DataFrame | None = None,
+    external_deductions: dict[str, pd.DataFrame] | None = None,
 ) -> None:
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
-        _summary_frame(employee_results, social, overtime).to_excel(
+        _summary_frame(employee_results, social, overtime, external_deductions).to_excel(
             writer, sheet_name="Resumen", index=False
         )
         for label, frame in employee_results.items():
@@ -193,7 +242,10 @@ def write_report(
         social.to_excel(writer, sheet_name="Seguridad_Social", index=False)
         if overtime is not None:
             overtime.to_excel(writer, sheet_name="Horas_Extras", index=False)
-        _exception_frame(social, overtime).to_excel(
+        for label, frame in (external_deductions or {}).items():
+            sheet_name = "Los_Olivos" if label == "los_olivos" else "Comfatolima"
+            frame.to_excel(writer, sheet_name=sheet_name, index=False)
+        _exception_frame(social, overtime, external_deductions).to_excel(
             writer, sheet_name="Excepciones", index=False
         )
 

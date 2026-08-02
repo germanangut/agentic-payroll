@@ -14,6 +14,8 @@ payroll:
     overtime_day: "HORA EXTRA DIURNA"
     overtime_night: "HORA EXTRA NOCTUR"
     night_surcharge: "RECARGO NOCTURNO"
+    los_olivos: "LOS OLIVOS SEGURO"
+    comfatolima: "COMFATOLIMA PREST"
 
 employee_list:
   sheet_name: "Hoja1"
@@ -80,3 +82,19 @@ overtime:
     hours_tolerance: 0.01
     monetary_rounding: 1
     adjusted_match_severity: "WARNING"
+
+external_deductions:
+  rules:
+    rule_version: "1.0"
+    rule_status: "provisional"
+    monetary_tolerance: 0
+  los_olivos:
+    rule_id: "los_olivos_monthly_invoice"
+    payroll_field: "los_olivos_value"
+    period_label: "MONTH"
+    expected_total: 699200
+  comfatolima:
+    rule_id: "comfatolima_expected_installment"
+    payroll_field: "comfatolima_value"
+    period_label: "MONTH"
+    expected_month: "FEB2026"
