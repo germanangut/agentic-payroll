@@ -11,6 +11,7 @@ The baseline reconciles:
 - consolidated overtime sources against Siigo daytime, nighttime and surcharge hours;
 - monthly Los Olivos invoice totals and Comfatolima expected installments against payroll deductions;
 - employee-loan deductions through consecutive Siigo balance reports;
+- a consolidated employee case file across every enabled control;
 - configurable provisional caps, lower bounds, tolerances and rule versions;
 - missing, additional and name-mismatched employees;
 - an Excel review workbook with summary, detailed controls and a normalized exception registry.
@@ -93,8 +94,7 @@ The overtime options and employee-loan report options are optional pairs: when o
 
 ## Next increments
 
-1. Build a consolidated employee case file.
-2. Add a human review and approval workflow.
-3. Validate provisional rules incrementally with payroll/accounting owners.
-4. Add incapacity and permission evidence.
-5. Add the first review interface and validate reusability with a second payroll month.
+1. Add a human review and approval workflow.
+2. Validate provisional rules incrementally with payroll/accounting owners.
+3. Add incapacity and permission evidence.
+4. Add the first review interface and validate reusability with a second payroll month.

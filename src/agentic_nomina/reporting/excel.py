@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from agentic_nomina.reporting.cases import build_employee_case_file
+
 
 def _summary_frame(
     employee_results: dict[str, pd.DataFrame],
@@ -129,6 +131,38 @@ def _social_exceptions(social: pd.DataFrame) -> list[dict[str, object]]:
     return rows
 
 
+def _employee_exceptions(
+    employee_results: dict[str, pd.DataFrame],
+) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for period, frame in employee_results.items():
+        for record in frame.to_dict(orient="records"):
+            if record.get("severity") == "OK":
+                continue
+            rows.append(
+                {
+                    "module": "EMPLOYEES",
+                    "period_label": period,
+                    "employee_id": record.get("employee_id"),
+                    "employee_name": record.get("employee_name_payroll")
+                    or record.get("employee_name_list"),
+                    "control": record.get("outcome"),
+                    "expected_value": record.get("in_employee_list"),
+                    "actual_value": record.get("in_payroll"),
+                    "difference": None,
+                    "severity": record.get("severity"),
+                    "rule_id": "employee_master_membership",
+                    "rule_version": "1.0",
+                    "rule_status": "PROVISIONAL",
+                    "source_file": None,
+                    "source_sheet": None,
+                    "source_row": None,
+                    "notes": f"employee_status={record.get('employee_status')}",
+                }
+            )
+    return rows
+
+
 def _overtime_exceptions(overtime: pd.DataFrame) -> list[dict[str, object]]:
     controls = {
         "day": ("expected_day_hours", "overtime_day_hours", "day_hours_difference"),
@@ -205,7 +239,6 @@ def _external_deduction_exceptions(
     return rows
 
 
-
 def _loan_exceptions(loans: pd.DataFrame) -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for record in loans.to_dict(orient="records"):
@@ -234,13 +267,16 @@ def _loan_exceptions(loans: pd.DataFrame) -> list[dict[str, object]]:
         )
     return rows
 
+
 def _exception_frame(
+    employee_results: dict[str, pd.DataFrame],
     social: pd.DataFrame,
     overtime: pd.DataFrame | None,
     external_deductions: dict[str, pd.DataFrame] | None,
     loans: pd.DataFrame | None,
 ) -> pd.DataFrame:
-    rows = _social_exceptions(social)
+    rows = _employee_exceptions(employee_results)
+    rows.extend(_social_exceptions(social))
     if overtime is not None:
         rows.extend(_overtime_exceptions(overtime))
     if external_deductions:
@@ -293,7 +329,10 @@ def write_report(
             frame.to_excel(writer, sheet_name=sheet_name, index=False)
         if loans is not None:
             loans.to_excel(writer, sheet_name="Prestamos", index=False)
-        _exception_frame(social, overtime, external_deductions, loans).to_excel(
+        build_employee_case_file(
+            employee_results, social, overtime, external_deductions, loans
+        ).to_excel(writer, sheet_name="Casos_Empleado", index=False)
+        _exception_frame(employee_results, social, overtime, external_deductions, loans).to_excel(
             writer, sheet_name="Excepciones", index=False
         )
 
