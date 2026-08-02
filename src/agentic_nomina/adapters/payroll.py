@@ -36,6 +36,9 @@ def load_payroll(path: str | Path, config: dict[str, Any], period_label: str) ->
     result["employee_name"] = data[name_col].map(clean_text)
     result = result[result["employee_id"].notna() & result["employee_name"].ne("")].copy()
     result["period_label"] = period_label
+    result["source_file"] = Path(path).name
+    result["source_sheet"] = sheet_name
+    result["source_row"] = result.index + 1
 
     for output, configured in {
         "salary_value": concepts.get("salary", ""),

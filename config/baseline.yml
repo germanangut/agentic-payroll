@@ -50,3 +50,33 @@ reconciliation:
   monetary_rounding: 100
   monetary_tolerance: 200
   days_tolerance: 0
+
+overtime:
+  sheet_name: "TOTAL HORAS EXTRAS"
+  header_row_zero_based: 1
+  columns_zero_based:
+    employee_id: 0
+    employee_name: 1
+    group: 2
+    cost_center: 3
+    subcost_center: 4
+    role: 5
+    reported_day_hours: 51
+    reported_night_hours: 52
+    reported_surcharge_hours: 53
+    pending_day_hours: 55
+    pending_night_hours: 56
+    pending_surcharge_hours: 57
+    deduct_hours: 59
+  rules:
+    rule_id: "overtime_hours_cap"
+    rule_version: "1.0"
+    rule_status: "provisional"
+    minimum_hours: 0
+    caps_hours:
+      day: 24
+      night: 24
+      surcharge: 24
+    hours_tolerance: 0.01
+    monetary_rounding: 1
+    adjusted_match_severity: "WARNING"

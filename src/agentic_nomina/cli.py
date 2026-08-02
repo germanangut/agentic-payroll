@@ -38,6 +38,14 @@ def reconcile(
         Path,
         typer.Option(exists=True, help="Monthly PILA Excel file."),
     ],
+    overtime_q1: Annotated[
+        Path | None,
+        typer.Option(exists=True, help="First-period overtime source workbook."),
+    ] = None,
+    overtime_q2: Annotated[
+        Path | None,
+        typer.Option(exists=True, help="Second-period overtime source workbook."),
+    ] = None,
     output: Annotated[Path, typer.Option()] = Path("data/processed/reconciliation.xlsx"),
     config_path: Annotated[Path, typer.Option("--config")] = Path("config/baseline.yml"),
 ) -> None:
@@ -48,6 +56,8 @@ def reconcile(
         employees_q1_path=employees_q1,
         employees_q2_path=employees_q2,
         pila_path=pila,
+        overtime_q1_path=overtime_q1,
+        overtime_q2_path=overtime_q2,
         output_path=output,
         config=config,
     )
@@ -55,6 +65,8 @@ def reconcile(
     typer.echo(f"Q1 employee controls: {len(results['Q1'])}")
     typer.echo(f"Q2 employee controls: {len(results['Q2'])}")
     typer.echo(f"Social security employees: {len(results['social_security'])}")
+    if "overtime" in results:
+        typer.echo(f"Overtime employee-period controls: {len(results['overtime'])}")
 
 
 if __name__ == "__main__":
