@@ -16,6 +16,7 @@ The baseline reconciles:
 - missing, additional and name-mismatched employees;
 - an Excel review workbook with summary, detailed controls and a normalized exception registry.
 - a human review ledger that preserves auditable decisions across reconciliation runs.
+- a versioned payroll-rule registry with version-specific approval evidence.
 
 The engine is deterministic. AI is intentionally excluded from financial calculations and
 approvals.
@@ -57,6 +58,15 @@ agentic-nomina reconcile \
 ```
 
 The overtime options and employee-loan report options are optional pairs: when one file in a pair is supplied, the other is required. Provider PDFs can be supplied independently. `--reviews` is optional and accepts a prior report or a CSV ledger.
+
+## Rule governance
+
+- `Reglas` is the editable versioned rule register included in every generated workbook.
+- Approval states are `PENDIENTE`, `EN_VALIDACION`, `APROBADA` and `RECHAZADA`.
+- An approval belongs to exactly one `rule_id` and `rule_version`; approved entries require a responsible person, date and evidence.
+- Reusing a prior workbook with `--rules` rejects duplicate, unknown and obsolete rule-version approvals.
+- Use `--require-approved-rules` to block the run unless every active financial rule has a complete `APROBADA` entry for its current version.
+- The existing `Revisiones` human-exception ledger remains independent and compatible.
 
 ## Human review workflow
 

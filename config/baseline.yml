@@ -2,6 +2,34 @@ company:
   name: "Empresa piloto"
   country: "CO"
 
+rule_governance:
+  registry:
+    - rule_id: "social_security_baseline"
+      rule_version: "1.0"
+      rule_name: "Aportes de salud, pensión y días trabajados"
+      active: true
+      financial: true
+    - rule_id: "overtime_hours_cap"
+      rule_version: "1.0"
+      rule_name: "Tope provisional de horas extras"
+      active: true
+      financial: true
+    - rule_id: "los_olivos_monthly_invoice"
+      rule_version: "1.0"
+      rule_name: "Descuento mensual Los Olivos"
+      active: true
+      financial: true
+    - rule_id: "comfatolima_expected_installment"
+      rule_version: "1.0"
+      rule_name: "Cuota esperada Comfatolima"
+      active: true
+      financial: true
+    - rule_id: "employee_loan_balance_movement"
+      rule_version: "1.0"
+      rule_name: "Movimiento de saldos de préstamos"
+      active: true
+      financial: true
+
 payroll:
   sheet_name: "Hoja1"
   header_markers: ["EMPLEADO", "NOMBRE EMPLEADO"]

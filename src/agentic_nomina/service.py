@@ -18,6 +18,12 @@ from agentic_nomina.reconciliation.overtime import reconcile_overtime
 from agentic_nomina.reconciliation.social_security import reconcile_social_security
 from agentic_nomina.reporting.excel import write_report
 from agentic_nomina.reporting.reviews import load_review_ledger
+from agentic_nomina.reporting.rules import (
+    apply_rule_ledger,
+    load_rule_ledger,
+    require_approved_financial_rules,
+    rule_registry_frame,
+)
 
 
 def run_baseline(
@@ -36,6 +42,8 @@ def run_baseline(
     loans_q1_path: str | Path | None = None,
     loans_q2_path: str | Path | None = None,
     reviews_path: str | Path | None = None,
+    rules_path: str | Path | None = None,
+    require_approved_rules: bool = False,
 ) -> dict[str, pd.DataFrame]:
     payroll_q1 = load_payroll(payroll_q1_path, config["payroll"], "Q1")
     payroll_q2 = load_payroll(payroll_q2_path, config["payroll"], "Q2")
@@ -110,6 +118,10 @@ def run_baseline(
         )
 
     reviews = load_review_ledger(reviews_path) if reviews_path is not None else None
+    rule_approvals = load_rule_ledger(rules_path) if rules_path is not None else None
+    rules = apply_rule_ledger(rule_registry_frame(config), rule_approvals)
+    if require_approved_rules:
+        require_approved_financial_rules(rules)
     write_report(
         output_path,
         employee_results,
@@ -118,6 +130,7 @@ def run_baseline(
         external_deductions,
         loans,
         reviews,
+        rules,
     )
     results = {**employee_results, "social_security": social, **external_deductions}
     if overtime is not None:
