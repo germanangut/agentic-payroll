@@ -33,8 +33,10 @@ def _rules() -> dict[str, object]:
 
 def test_los_olivos_parser_reads_primary_affiliate_total() -> None:
     pages = [
-        "ACOSTA MOLINA EFRAIN93085376CCT -  28/02/2026  18.500  "
-        "21.60001/02/2026   COBRO  0  0"
+        (
+            "ACOSTA MOLINA EFRAIN93085376CCT -  28/02/2026  18.500  "
+            "21.60001/02/2026   COBRO  0  0"
+        )
     ]
 
     result = parse_los_olivos_text(pages, source_file="olivos.pdf").iloc[0]
@@ -48,8 +50,11 @@ def test_los_olivos_parser_reads_primary_affiliate_total() -> None:
 
 def test_comfatolima_parser_reads_february_expected_value() -> None:
     pages = [
-        "14377 93085383 AYALA GUZMAN RUBIEL $ 4.000.000 30/04/2025 "
-        "31/03/2026 $355.395 $ 355.395 $ 355.395 $ 355.395 $ 355.395 $ 1.421.580"
+        (
+            "14377 93085383 AYALA GUZMAN RUBIEL $ 4.000.000 30/04/2025 "
+            "31/03/2026 $355.395 $ 355.395 $ 355.395 $ 355.395 "
+            "$ 355.395 $ 1.421.580"
+        )
     ]
 
     result = parse_comfatolima_text(pages, source_file="comfatolima.pdf").iloc[0]
