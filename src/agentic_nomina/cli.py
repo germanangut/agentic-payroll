@@ -46,6 +46,14 @@ def reconcile(
         Path | None,
         typer.Option(exists=True, help="Second-period overtime source workbook."),
     ] = None,
+    los_olivos: Annotated[
+        Path | None,
+        typer.Option(exists=True, help="Monthly Los Olivos affiliate invoice PDF."),
+    ] = None,
+    comfatolima: Annotated[
+        Path | None,
+        typer.Option(exists=True, help="Monthly Comfatolima credit report PDF."),
+    ] = None,
     output: Annotated[Path, typer.Option()] = Path("data/processed/reconciliation.xlsx"),
     config_path: Annotated[Path, typer.Option("--config")] = Path("config/baseline.yml"),
 ) -> None:
@@ -58,6 +66,8 @@ def reconcile(
         pila_path=pila,
         overtime_q1_path=overtime_q1,
         overtime_q2_path=overtime_q2,
+        los_olivos_path=los_olivos,
+        comfatolima_path=comfatolima,
         output_path=output,
         config=config,
     )
@@ -67,6 +77,10 @@ def reconcile(
     typer.echo(f"Social security employees: {len(results['social_security'])}")
     if "overtime" in results:
         typer.echo(f"Overtime employee-period controls: {len(results['overtime'])}")
+    if "los_olivos" in results:
+        typer.echo(f"Los Olivos employee controls: {len(results['los_olivos'])}")
+    if "comfatolima" in results:
+        typer.echo(f"Comfatolima employee controls: {len(results['comfatolima'])}")
 
 
 if __name__ == "__main__":

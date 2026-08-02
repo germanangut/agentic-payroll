@@ -26,3 +26,17 @@ The overtime increment applies configurable lower bounds and caps before compari
 with Siigo hours. A match produced by an adjustment is a `WARNING`, not an unconditional `OK`.
 An unexplained mismatch is `REVIEW`; an active amount missing from one entire source is
 `BLOCKING`.
+
+
+## Structured PDF deduction lane
+
+Los Olivos and Comfatolima use a deterministic text-PDF lane:
+
+```text
+structured PDF -> page text -> provider parser -> canonical deduction record
+               -> employee-id join -> provisional comparison -> report/exception
+```
+
+The provider parser stores page and extracted-line references. The comparison uses the second-period
+payroll deduction because both February sources are monthly statements reflected in that payroll export.
+Missing active provider records are `BLOCKING`; matched value differences are `REVIEW`.

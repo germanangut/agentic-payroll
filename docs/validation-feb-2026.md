@@ -47,3 +47,28 @@ hours, so the prototype keeps all three caps configurable and explicitly provisi
 
 The monetary estimates in the detailed output use the hourly rate observed in the payroll export.
 They are diagnostic estimates, not an independent recalculation of legally payable overtime.
+
+
+## External deductions validation
+
+The structured-PDF adapters were executed locally against the February Los Olivos invoice and
+Comfatolima credit report, then compared with the second-period Siigo payroll export.
+
+### Los Olivos
+
+- 31 primary affiliate deductions were extracted.
+- Provider total: COP 699,200.
+- Payroll total: COP 699,200.
+- 31 exact matches and no exceptions.
+
+### Comfatolima
+
+- 42 credit rows were extracted; 39 contained an active February expected amount.
+- Expected February total: COP 7,435,735.
+- Payroll deduction total: COP 6,536,650.
+- Total difference: COP -899,085 from payroll relative to the provider source.
+- 38 records were `OK`, including inactive zero-amount rows.
+- 3 active provider records were `BLOCKING` because the employees were absent from payroll.
+- 1 active employee was `REVIEW` because the expected COP 188,294 deduction was zero in payroll.
+
+These classifications are evidence for review, not approved payroll corrections.
