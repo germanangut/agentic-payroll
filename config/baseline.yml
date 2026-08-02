@@ -1,0 +1,52 @@
+company:
+  name: "Empresa piloto"
+  country: "CO"
+
+payroll:
+  sheet_name: "Hoja1"
+  header_markers: ["EMPLEADO", "NOMBRE EMPLEADO"]
+  concepts:
+    employee_id: "EMPLEADO"
+    employee_name: "NOMBRE EMPLEADO"
+    salary: "SUELDO BASICO"
+    health_employee: "APORTES SALUD"
+    pension_employee: "APORTE PENSION"
+    overtime_day: "HORA EXTRA DIURNA"
+    overtime_night: "HORA EXTRA NOCTUR"
+    night_surcharge: "RECARGO NOCTURNO"
+
+employee_list:
+  sheet_name: "Hoja1"
+  header_markers: ["NIT", "NOMBRE", "EST"]
+  fields:
+    employee_id: "NIT"
+    employee_name: "NOMBRE"
+    status: "EST"
+    retirement_date: "F. RETIRO"
+
+pila:
+  sheet_name: "Sheet1"
+  columns_zero_based:
+    employee_id: 4
+    employee_name: 8
+    pension_days: 35
+    pension_ibc: 36
+    pension_total_contribution: 38
+    health_days: 42
+    health_ibc: 43
+    health_employee_contribution: 46
+    ccf_days: 48
+    ccf_ibc: 50
+    ccf_contribution: 51
+    arl_days: 55
+    arl_ibc: 58
+    arl_rate: 61
+    arl_contribution: 62
+    total_contributions: 69
+
+reconciliation:
+  health_employee_rate: 0.04
+  pension_employee_rate: 0.04
+  monetary_rounding: 100
+  monetary_tolerance: 200
+  days_tolerance: 0

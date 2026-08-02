@@ -1,0 +1,35 @@
+import pandas as pd
+
+from agentic_nomina.reconciliation.employees import reconcile_employees
+
+
+def test_employee_reconciliation_classifies_missing_and_extra() -> None:
+    employee_list = pd.DataFrame(
+        [
+            {"employee_id": "1", "employee_name": "Ana", "employee_status": "E"},
+            {"employee_id": "2", "employee_name": "Luis", "employee_status": "V"},
+        ]
+    )
+    payroll = pd.DataFrame(
+        [
+            {"employee_id": "1", "employee_name": "Ana"},
+            {"employee_id": "3", "employee_name": "Marta"},
+        ]
+    )
+
+    result = reconcile_employees(employee_list, payroll).set_index("employee_id")
+    assert result.at["1", "severity"] == "OK"
+    assert result.at["2", "severity"] == "WARNING"
+    assert result.at["3", "severity"] == "BLOCKING"
+
+
+def test_employee_reconciliation_accepts_source_name_truncation() -> None:
+    employee_list = pd.DataFrame(
+        [{"employee_id": "1", "employee_name": "RODRIGUEZ GUTIERREZ KARLA ALEJANDRA", "employee_status": "E"}]
+    )
+    payroll = pd.DataFrame(
+        [{"employee_id": "1", "employee_name": "RODRIGUEZ GUTIERREZ KARLA ALEJ"}]
+    )
+    result = reconcile_employees(employee_list, payroll).iloc[0]
+    assert result["severity"] == "OK"
+    assert result["outcome"] == "MATCHED"
