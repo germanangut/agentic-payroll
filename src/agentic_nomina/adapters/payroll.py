@@ -49,6 +49,7 @@ def load_payroll(path: str | Path, config: dict[str, Any], period_label: str) ->
         "night_surcharge_value": concepts.get("night_surcharge", ""),
         "los_olivos_value": concepts.get("los_olivos", ""),
         "comfatolima_value": concepts.get("comfatolima", ""),
+        "loan_value": concepts.get("loan", ""),
     }.items():
         column = _column_by_prefix(headers, configured) if configured else None
         result[output] = data.loc[result.index, column].map(numeric).abs() if column else 0.0

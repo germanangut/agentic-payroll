@@ -10,6 +10,7 @@ The baseline reconciles:
 - monthly PILA detail against payroll health, pension and worked-day values;
 - consolidated overtime sources against Siigo daytime, nighttime and surcharge hours;
 - monthly Los Olivos invoice totals and Comfatolima expected installments against payroll deductions;
+- employee-loan deductions through consecutive Siigo balance reports;
 - configurable provisional caps, lower bounds, tolerances and rule versions;
 - missing, additional and name-mismatched employees;
 - an Excel review workbook with summary, detailed controls and a normalized exception registry.
@@ -47,10 +48,12 @@ agentic-nomina reconcile \
   --overtime-q2 "data/raw/PLANILLA EXTRAS 13 Febrero al 28.xlsx" \
   --los-olivos "data/raw/LOS OLIVOS.pdf" \
   --comfatolima "data/raw/NOVEDADES AGREGADOS NACIONALES FEBRERO 2026..pdf" \
+  --loans-q1 "data/raw/PRESTAMO FEBRERO 2026.pdf" \
+  --loans-q2 "data/raw/PRESTAMOS 2DA QUINCENA FEBRERO 2026.pdf" \
   --output "data/processed/reconciliation-feb-2026.xlsx"
 ```
 
-The two overtime options are optional, but they must be supplied together.
+The overtime options and employee-loan report options are optional pairs: when one file in a pair is supplied, the other is required. Provider PDFs can be supplied independently.
 
 ## Overtime rule semantics
 
@@ -71,6 +74,15 @@ The two overtime options are optional, but they must be supplied together.
 - An active provider amount with no payroll employee match is `BLOCKING`.
 - Provider balances and arrears remain context only; the engine does not alter payroll.
 
+## Employee-loan rule semantics
+
+- Each report preserves opening balance, period debits, period credits and reported balance.
+- The first-period expected deduction is the reduction from its reported balance to the next report's opening balance.
+- A missing employee in the next report is provisionally interpreted as a zero opening balance, allowing fully paid loans to reconcile.
+- The last available period is `WARNING` with `PENDING_NEXT_CUTOFF`; its projected closing balance is diagnostic until the following report is available.
+- A payroll deduction without a source balance, or a deduction exceeding the reported balance, is `BLOCKING`. Unexplained balance differences are `REVIEW`.
+- These rules are provisional and do not authorize accounting or payroll adjustments.
+
 ## Architecture
 
 - `adapters/`: source-specific extraction and normalization;
@@ -81,8 +93,8 @@ The two overtime options are optional, but they must be supplied together.
 
 ## Next increments
 
-1. Add loan balance-movement reconciliation.
-2. Build a consolidated employee case file.
-3. Add a human review and approval workflow.
-4. Validate provisional rules incrementally with payroll/accounting owners.
-5. Add the first review interface.
+1. Build a consolidated employee case file.
+2. Add a human review and approval workflow.
+3. Validate provisional rules incrementally with payroll/accounting owners.
+4. Add incapacity and permission evidence.
+5. Add the first review interface and validate reusability with a second payroll month.

@@ -40,3 +40,20 @@ structured PDF -> page text -> provider parser -> canonical deduction record
 The provider parser stores page and extracted-line references. The comparison uses the second-period
 payroll deduction because both February sources are monthly statements reflected in that payroll export.
 Missing active provider records are `BLOCKING`; matched value differences are `REVIEW`.
+
+
+## Employee-loan balance lane
+
+Employee loans use consecutive Siigo detailed-by-third-party reports:
+
+```text
+period report -> opening/movements/reported balance -> employee-id join
+              -> next-period opening balance + payroll deduction
+              -> deterministic balance movement -> report/exception
+```
+
+For a period with a following report, the expected payroll deduction is the prior reported balance
+minus the next report's opening balance. An employee absent from the next report is provisionally
+assigned a zero opening balance so fully paid loans remain reconcilable. For the final available
+period, the engine calculates a projected closing balance but emits `PENDING_NEXT_CUTOFF` as a
+`WARNING`; it does not claim the deduction is validated until another report is supplied.
