@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 
 from agentic_nomina.reporting.cases import build_employee_case_file
+from agentic_nomina.reporting.reviews import apply_review_ledger, review_sheet
 
 
 def _summary_frame(
@@ -311,6 +312,7 @@ def write_report(
     overtime: pd.DataFrame | None = None,
     external_deductions: dict[str, pd.DataFrame] | None = None,
     loans: pd.DataFrame | None = None,
+    reviews: pd.DataFrame | None = None,
 ) -> None:
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -332,9 +334,12 @@ def write_report(
         build_employee_case_file(
             employee_results, social, overtime, external_deductions, loans
         ).to_excel(writer, sheet_name="Casos_Empleado", index=False)
-        _exception_frame(employee_results, social, overtime, external_deductions, loans).to_excel(
-            writer, sheet_name="Excepciones", index=False
+        exceptions = apply_review_ledger(
+            _exception_frame(employee_results, social, overtime, external_deductions, loans),
+            reviews,
         )
+        exceptions.to_excel(writer, sheet_name="Excepciones", index=False)
+        review_sheet(exceptions).to_excel(writer, sheet_name="Revisiones", index=False)
 
         for worksheet in writer.book.worksheets:
             worksheet.freeze_panes = "A2"
