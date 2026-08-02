@@ -20,6 +20,9 @@ __pycache__/
 .coverage
 htmlcov/
 
+# Python build metadata
+*.egg-info/
+
 # IDE / OS
 .vscode/
 .idea/
