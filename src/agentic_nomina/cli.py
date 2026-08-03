@@ -19,25 +19,25 @@ def main() -> None:
 @app.command("reconcile")
 def reconcile(
     payroll_q1: Annotated[
-        Path,
-        typer.Option(exists=True, help="First payroll period Excel file."),
-    ],
+        Path | None,
+        typer.Option(help="Primer archivo de nómina (o declararlo en --manifest)."),
+    ] = None,
     payroll_q2: Annotated[
-        Path,
-        typer.Option(exists=True, help="Second payroll period Excel file."),
-    ],
+        Path | None,
+        typer.Option(help="Segundo archivo de nómina (o declararlo en --manifest)."),
+    ] = None,
     employees_q1: Annotated[
-        Path,
-        typer.Option(exists=True, help="First employee list Excel file."),
-    ],
+        Path | None,
+        typer.Option(help="Primera lista de empleados (o declararla en --manifest)."),
+    ] = None,
     employees_q2: Annotated[
-        Path,
-        typer.Option(exists=True, help="Second employee list Excel file."),
-    ],
+        Path | None,
+        typer.Option(help="Segunda lista de empleados (o declararla en --manifest)."),
+    ] = None,
     pila: Annotated[
-        Path,
-        typer.Option(exists=True, help="Monthly PILA Excel file."),
-    ],
+        Path | None,
+        typer.Option(help="Archivo PILA mensual (o declararlo en --manifest)."),
+    ] = None,
     overtime_q1: Annotated[
         Path | None,
         typer.Option(exists=True, help="First-period overtime source workbook."),
@@ -78,6 +78,9 @@ def reconcile(
         typer.Option("--require-approved-rules", help="Block runs with unapproved active financial rules."),
     ] = False,
     absence_evidence: Annotated[list[Path] | None, typer.Option("--absence-evidence", exists=True, help="Absence evidence PDF or normalized CSV; may be repeated.")] = None,
+    period: Annotated[str | None, typer.Option("--period", help="Business period in YYYY-MM format.")] = None,
+    run_id: Annotated[str | None, typer.Option("--run-id", help="Auditable run identifier.")] = None,
+    manifest: Annotated[Path | None, typer.Option("--manifest", exists=True, help="Manifiesto YAML técnico de la corrida.")] = None,
     output: Annotated[Path, typer.Option()] = Path("data/processed/reconciliation.xlsx"),
     config_path: Annotated[Path, typer.Option("--config")] = Path("config/baseline.yml"),
 ) -> None:
@@ -98,6 +101,9 @@ def reconcile(
         rules_path=rules,
         require_approved_rules=require_approved_rules,
         absence_evidence_paths=absence_evidence or [],
+        business_period=period,
+        run_id=run_id,
+        manifest_path=manifest,
         output_path=output,
         config=config,
     )

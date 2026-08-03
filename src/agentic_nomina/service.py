@@ -27,6 +27,7 @@ from agentic_nomina.reporting.rules import (
     require_approved_financial_rules,
     rule_registry_frame,
 )
+from agentic_nomina.run_manifest import build_run_metadata, execution_frame, resolve_run_contract
 
 
 def run_baseline(
@@ -48,7 +49,30 @@ def run_baseline(
     rules_path: str | Path | None = None,
     require_approved_rules: bool = False,
     absence_evidence_paths: list[str | Path] | None = None,
+    business_period: str | None = None,
+    run_id: str | None = None,
+    manifest_path: str | Path | None = None,
 ) -> dict[str, pd.DataFrame]:
+    sources, business_period, run_id, diagnostics = resolve_run_contract(
+        {"payroll_q1": payroll_q1_path, "payroll_q2": payroll_q2_path,
+         "employees_q1": employees_q1_path, "employees_q2": employees_q2_path,
+         "pila": pila_path, "overtime_q1": overtime_q1_path, "overtime_q2": overtime_q2_path,
+         "los_olivos": los_olivos_path, "comfatolima": comfatolima_path,
+         "loans_q1": loans_q1_path, "loans_q2": loans_q2_path,
+         "reviews": reviews_path, "rules": rules_path, "absence_evidence": None},
+        period=business_period, run_id=run_id, manifest_path=manifest_path,
+    )
+    metadata, manifest, preflight = build_run_metadata(
+        config["company"]["name"], business_period, run_id, sources,
+        config=config, output_path=output_path, diagnostics=diagnostics,
+    )
+    payroll_q1_path, payroll_q2_path = sources["payroll_q1"], sources["payroll_q2"]
+    employees_q1_path, employees_q2_path = sources["employees_q1"], sources["employees_q2"]
+    pila_path = sources["pila"]
+    overtime_q1_path, overtime_q2_path = sources["overtime_q1"], sources["overtime_q2"]
+    los_olivos_path, comfatolima_path = sources["los_olivos"], sources["comfatolima"]
+    loans_q1_path, loans_q2_path = sources["loans_q1"], sources["loans_q2"]
+    reviews_path, rules_path = sources["reviews"], sources["rules"]
     payroll_q1 = load_payroll(payroll_q1_path, config["payroll"], "Q1")
     payroll_q2 = load_payroll(payroll_q2_path, config["payroll"], "Q2")
     employees_q1 = load_employee_list(employees_q1_path, config["employee_list"], "Q1")
@@ -148,6 +172,7 @@ def run_baseline(
         rules,
         absences,
         set(config.get("review_continuity", {}).get("reusable_non_financial_rule_ids", [])),
+        execution_frame(metadata, manifest, preflight, rules),
     )
     results = {**employee_results, "social_security": social, **external_deductions}
     if overtime is not None:
@@ -156,4 +181,5 @@ def run_baseline(
         results["loans"] = loans
     if absences is not None:
         results["absences"] = absences
+    results["run_metadata"] = pd.DataFrame([metadata.model_dump()])
     return results

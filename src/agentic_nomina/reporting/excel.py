@@ -329,6 +329,7 @@ def write_report(
     rules: pd.DataFrame | None = None,
     absences: pd.DataFrame | None = None,
     reusable_rule_ids: set[str] | None = None,
+    execution: pd.DataFrame | None = None,
 ) -> None:
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -364,6 +365,8 @@ def write_report(
         )
         if absences is not None:
             absences.to_excel(writer, sheet_name="Ausencias", index=False)
+        if execution is not None:
+            execution.to_excel(writer, sheet_name="Ejecucion", index=False)
 
         for worksheet in writer.book.worksheets:
             worksheet.freeze_panes = "A2"

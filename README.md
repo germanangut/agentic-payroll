@@ -59,6 +59,37 @@ agentic-nomina reconcile \
 
 The overtime options and employee-loan report options are optional pairs: when one file in a pair is supplied, the other is required. Provider PDFs can be supplied independently. `--reviews` is optional and accepts a prior report or a CSV ledger.
 
+## Manifiesto de corrida y preflight
+
+Cada ejecución tiene un `run_id`, un período técnico opcional `YYYY-MM`, marca UTC y versión
+de esquema. `--period` y `--run-id` son aditivos; si no se indica período se exporta
+`NO_ESPECIFICADO` y si no se indica identificador se genera uno. Antes de leer una fuente, el
+preflight valida las cinco fuentes obligatorias, los pares reales de horas extra y préstamos,
+archivos regulares, extensiones permitidas, rutas repetidas, registro de reglas activo y una
+salida que no pueda sobrescribir una entrada. No inspecciona ni expone registros de nómina.
+
+También puede usarse un manifiesto YAML local de ejecución:
+
+```yaml
+schema_version: "1.0"
+business_period: "2026-02"
+run_id: "SINTETICO-2026-02"
+sources:
+  payroll_q1: "data/raw/synthetic-payroll-q1.xlsx"
+  payroll_q2: "data/raw/synthetic-payroll-q2.xlsx"
+  employees_q1: "data/raw/synthetic-employees-q1.xlsx"
+  employees_q2: "data/raw/synthetic-employees-q2.xlsx"
+  pila: "data/raw/synthetic-pila.xlsx"
+```
+
+Use `--manifest ruta.yml`. La precedencia es CLI, manifiesto y finalmente los valores
+generados/default compatibles; una contradicción CLI/manifiesto queda como advertencia visible.
+Las rutas sólo se usan durante la ejecución: la hoja `Ejecucion` conserva un nombre base
+sanitizado a partir del identificador lógico, SHA-256, tamaño, identificador lógico, estado y diagnósticos. Incluye además las reglas
+activas, versión, gobernanza y naturaleza financiera, sin valores de nómina ni datos personales.
+El hash identifica el archivo exacto, pero no sustituye la política de retención ni la evidencia
+operativa.
+
 ## Rule governance
 
 - `Reglas` is the editable versioned rule register included in every generated workbook.
@@ -137,8 +168,10 @@ The overtime options and employee-loan report options are optional pairs: when o
 - `config/`: client mappings, rule versions, caps, rates, rounding and tolerances;
 - `tests/`: synthetic regression tests.
 
-## Next increments
+## Límites operativos pendientes
 
-1. Validate provisional rules incrementally with payroll/accounting owners.
-2. Add incapacity and permission evidence.
-3. Add the first review interface and validate reusability with a second payroll month.
+Ausencias, continuidad multiperíodo y la interfaz de revisión en Excel ya están implementadas
+con datos sintéticos. Continúan pendientes la convención productiva de período y nombres de
+fuentes, retención de hashes/metadatos, matriz real de roles y evidencias, y la aceptación
+operativa y regulatoria por nómina y contabilidad. El manifiesto no cambia cálculos, días,
+bases, aportes, descuentos ni pagos.
