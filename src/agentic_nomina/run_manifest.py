@@ -64,8 +64,10 @@ def resolve_run_contract(
         return sources, period, run_id, diagnostics
     external = load_external_manifest(manifest_path)
     external_sources = external["sources"]
+    manifest_dir = Path(manifest_path).parent
     resolved = dict(sources)
     for name, value in external_sources.items():
+        value = str((manifest_dir / value).resolve()) if not Path(value).is_absolute() else value
         if name in resolved and resolved[name] is not None and str(resolved[name]) != str(value):
             diagnostics.append({"severity": "WARNING", "code": "CLI_MANIFEST_CONTRADICTION", "message": f"La fuente CLI prevalece sobre el manifiesto para {name}."})
         elif resolved.get(name) is None:

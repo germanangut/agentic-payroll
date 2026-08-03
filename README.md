@@ -90,6 +90,25 @@ activas, versión, gobernanza y naturaleza financiera, sin valores de nómina ni
 El hash identifica el archivo exacto, pero no sustituye la política de retención ni la evidencia
 operativa.
 
+## Demostración sintética reproducible
+
+Desde un clon limpio puede recorrerse el flujo completo sin archivos reales:
+
+```bash
+agentic-nomina demo --output-dir C:\temp\agentic-nomina-demo
+```
+
+El directorio debe ser explícito y estar vacío o no existir; el comando nunca borra ni
+sobrescribe contenido. Genera entradas ficticias, `manifest.yml`, `summary.json` y
+`results/agentic-nomina-demo.xlsx`, ejecutando el mismo manifiesto, preflight, servicio y
+exportador de `reconcile`. El período por defecto es el técnico sintético `2099-01`; puede
+sobrescribirse con `--period` y el identificador puede fijarse con `--run-id`.
+
+Inspeccione `Ejecucion`, `Resumen`, `Excepciones`, `Revisiones`, `Casos_Empleado` y `Reglas`.
+Los artefactos se marcan **SINTÉTICO — DEMOSTRACIÓN — SIN EFECTO FINANCIERO**, no deben
+publicarse y pueden eliminarse manualmente cuando el operador lo decida. La demo no constituye
+validación laboral, contable, tributaria ni regulatoria.
+
 ## Rule governance
 
 - `Reglas` is the editable versioned rule register included in every generated workbook.
