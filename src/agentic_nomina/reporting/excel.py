@@ -269,12 +269,17 @@ def _loan_exceptions(loans: pd.DataFrame) -> list[dict[str, object]]:
     return rows
 
 
+def _absence_exceptions(absences: pd.DataFrame) -> list[dict[str, object]]:
+    return [{"module": "ABSENCES", "period_label": r.get("period_label"), "employee_id": r.get("employee_id"), "employee_name": r.get("employee_name_evidence") or r.get("employee_name_payroll"), "control": r.get("absence_type"), "expected_value": r.get("expected_units"), "actual_value": r.get("actual_units"), "difference": r.get("difference"), "severity": r.get("severity"), "rule_id": "absence_evidence_vs_payroll", "rule_version": "1.0", "rule_status": "PROVISIONAL", "source_file": None, "source_sheet": None, "source_row": None, "notes": r.get("evidence_status")} for r in absences.to_dict("records") if r.get("severity") != "OK"]
+
+
 def _exception_frame(
     employee_results: dict[str, pd.DataFrame],
     social: pd.DataFrame,
     overtime: pd.DataFrame | None,
     external_deductions: dict[str, pd.DataFrame] | None,
     loans: pd.DataFrame | None,
+    absences: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     rows = _employee_exceptions(employee_results)
     rows.extend(_social_exceptions(social))
@@ -284,6 +289,8 @@ def _exception_frame(
         rows.extend(_external_deduction_exceptions(external_deductions))
     if loans is not None:
         rows.extend(_loan_exceptions(loans))
+    if absences is not None:
+        rows.extend(_absence_exceptions(absences))
     columns = [
         "module",
         "period_label",
@@ -314,6 +321,7 @@ def write_report(
     loans: pd.DataFrame | None = None,
     reviews: pd.DataFrame | None = None,
     rules: pd.DataFrame | None = None,
+    absences: pd.DataFrame | None = None,
 ) -> None:
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -333,10 +341,10 @@ def write_report(
         if loans is not None:
             loans.to_excel(writer, sheet_name="Prestamos", index=False)
         build_employee_case_file(
-            employee_results, social, overtime, external_deductions, loans
+            employee_results, social, overtime, external_deductions, loans, absences
         ).to_excel(writer, sheet_name="Casos_Empleado", index=False)
         exceptions = apply_review_ledger(
-            _exception_frame(employee_results, social, overtime, external_deductions, loans),
+            _exception_frame(employee_results, social, overtime, external_deductions, loans, absences),
             reviews,
         )
         exceptions.to_excel(writer, sheet_name="Excepciones", index=False)
@@ -344,6 +352,8 @@ def write_report(
         (rules if rules is not None else pd.DataFrame()).to_excel(
             writer, sheet_name="Reglas", index=False
         )
+        if absences is not None:
+            absences.to_excel(writer, sheet_name="Ausencias", index=False)
 
         for worksheet in writer.book.worksheets:
             worksheet.freeze_panes = "A2"

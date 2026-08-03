@@ -77,6 +77,7 @@ def reconcile(
         bool,
         typer.Option("--require-approved-rules", help="Block runs with unapproved active financial rules."),
     ] = False,
+    absence_evidence: Annotated[list[Path] | None, typer.Option("--absence-evidence", exists=True, help="Absence evidence PDF or normalized CSV; may be repeated.")] = None,
     output: Annotated[Path, typer.Option()] = Path("data/processed/reconciliation.xlsx"),
     config_path: Annotated[Path, typer.Option("--config")] = Path("config/baseline.yml"),
 ) -> None:
@@ -96,6 +97,7 @@ def reconcile(
         reviews_path=reviews,
         rules_path=rules,
         require_approved_rules=require_approved_rules,
+        absence_evidence_paths=absence_evidence or [],
         output_path=output,
         config=config,
     )
