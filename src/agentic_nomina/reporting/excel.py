@@ -322,6 +322,7 @@ def write_report(
     reviews: pd.DataFrame | None = None,
     rules: pd.DataFrame | None = None,
     absences: pd.DataFrame | None = None,
+    reusable_rule_ids: set[str] | None = None,
 ) -> None:
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -345,7 +346,7 @@ def write_report(
         ).to_excel(writer, sheet_name="Casos_Empleado", index=False)
         exceptions = apply_review_ledger(
             _exception_frame(employee_results, social, overtime, external_deductions, loans, absences),
-            reviews,
+            reviews, reusable_rule_ids=reusable_rule_ids,
         )
         exceptions.to_excel(writer, sheet_name="Excepciones", index=False)
         review_sheet(exceptions).to_excel(writer, sheet_name="Revisiones", index=False)

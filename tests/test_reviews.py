@@ -128,3 +128,38 @@ def test_report_exports_reusable_review_sheet(tmp_path) -> None:
     ledger = load_review_ledger(output)
     assert ledger.loc[0, "review_status"] == "PENDIENTE"
     assert ledger.loc[0, "exception_id"].startswith("EXC-")
+
+
+def test_cross_period_precedent_keeps_new_revision_pending() -> None:
+    january = _exceptions()
+    january.loc[0, "period_label"] = "2026-01"
+    prior = apply_review_ledger(january)
+    prior.loc[0, ["review_status", "review_decision", "reviewer", "reviewed_at"]] = [
+        "RESUELTO", "CONFIRMADO", "auditor", "2026-01-31"
+    ]
+    february = _exceptions()
+    february.loc[0, "period_label"] = "2026-02"
+    current = apply_review_ledger(february, prior).iloc[0]
+    assert current["revision_id"] != prior.loc[0, "revision_id"]
+    assert current["material_fingerprint"] == prior.loc[0, "material_fingerprint"]
+    assert current["review_status"] == "PENDIENTE"
+    assert current["previous_revision_id"] == prior.loc[0, "revision_id"]
+    assert current["decision_origin"] == "PRECEDENTE_CONTEXTO"
+
+
+def test_changed_material_and_ambiguous_precedents_stay_pending() -> None:
+    previous = apply_review_ledger(_exceptions())
+    previous.loc[0, ["review_status", "review_decision", "reviewer", "reviewed_at"]] = [
+        "RESUELTO", "FALSO_POSITIVO", "auditor", "2026-01-31"
+    ]
+    changed = apply_review_ledger(_exceptions(actual_value=80.0), previous).iloc[0]
+    assert changed["continuity_status"] == "SIN_PRECEDENTE"
+
+    ambiguous = pd.concat(
+        [previous, previous.assign(exception_id="EXC-OTHER", revision_id="EXC-OTHER")], ignore_index=True
+    )
+    next_month = _exceptions()
+    next_month.loc[0, "period_label"] = "2026-02"
+    current = apply_review_ledger(next_month, ambiguous).iloc[0]
+    assert current["continuity_status"] == "AMBIGUO"
+    assert current["review_status"] == "PENDIENTE"

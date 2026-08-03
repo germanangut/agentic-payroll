@@ -78,6 +78,14 @@ The overtime options and employee-loan report options are optional pairs: when o
 - If a finding changes materially, it receives a new identifier and returns to `PENDIENTE`.
 - A stale or unknown identifier blocks the run instead of silently transferring an old approval.
 
+## Multi-period review continuity
+
+- `revision_id` is period-specific; it never transfers between reporting periods.
+- `material_fingerprint` compares only material content: module, employee, control, expected and actual values, difference, severity, rule id/version and evidence file. It excludes period, row position and cosmetic notes.
+- A prior exact match is audit context only by default. Financial approvals never transfer between periods.
+- A non-financial `FALSO_POSITIVO` may be reused only for a configured rule id, one complete exact precedent and no ambiguity.
+- Operational acceptance with a real second payroll month remains pending; synthetic two-period fixtures validate the technical continuity contract.
+
 ## Overtime rule semantics
 
 - Raw hours remain visible in the output.
