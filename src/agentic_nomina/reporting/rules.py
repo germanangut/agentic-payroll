@@ -5,7 +5,7 @@ from typing import Any
 
 import pandas as pd
 
-RULE_STATUSES = {"PENDIENTE", "EN_VALIDACION", "APROBADA", "RECHAZADA"}
+RULE_STATUSES = {"PENDIENTE", "EN_VALIDACION", "VALIDADA", "APROBADA", "RECHAZADA"}
 RULE_KEY_COLUMNS = ["rule_id", "rule_version"]
 RULE_APPROVAL_COLUMNS = [
     "rule_id",
@@ -14,6 +14,20 @@ RULE_APPROVAL_COLUMNS = [
     "responsable_aprobacion",
     "fecha_aprobacion",
     "evidencia_aprobacion",
+    "validation_status",
+    "approver_role",
+    "approver_id",
+    "approver_name",
+    "evidence_type",
+    "evidence_reference",
+    "evidence_date",
+    "decision_date",
+    "decision",
+    "decision_comment",
+    "validation_record_id",
+    "previous_validation_record_id",
+    "created_at",
+    "decision_origin",
 ]
 
 
@@ -37,27 +51,41 @@ def load_rule_ledger(path: str | Path) -> pd.DataFrame:
         frame = pd.read_csv(path, dtype=str).fillna("")
     else:
         frame = pd.read_excel(path, sheet_name="Reglas", dtype=str).fillna("")
-    missing = set(RULE_APPROVAL_COLUMNS) - set(frame.columns)
+    required = {"rule_id", "rule_version", "estado_aprobacion", "responsable_aprobacion", "fecha_aprobacion", "evidencia_aprobacion"}
+    missing = required - set(frame.columns)
     if missing:
         raise ValueError(f"Rule ledger is missing columns: {', '.join(sorted(missing))}")
+    for column in RULE_APPROVAL_COLUMNS:
+        if column not in frame:
+            frame[column] = ""
     return validate_rule_ledger(frame[RULE_APPROVAL_COLUMNS].copy())
 
 
 def validate_rule_ledger(frame: pd.DataFrame) -> pd.DataFrame:
+    legacy = "validation_status" not in frame
+    for column in RULE_APPROVAL_COLUMNS:
+        if column not in frame:
+            frame[column] = ""
     if frame.duplicated(RULE_KEY_COLUMNS).any():
         raise ValueError("Rule ledger contains duplicate approvals for the same rule version.")
     statuses = set(frame["estado_aprobacion"]) - RULE_STATUSES
     if statuses:
         raise ValueError(f"Invalid rule approval statuses: {', '.join(sorted(statuses))}")
-    approved = frame["estado_aprobacion"].eq("APROBADA")
+    frame["validation_status"] = frame["validation_status"].where(frame["validation_status"].ne(""), frame["estado_aprobacion"])
+    approved = frame["validation_status"].isin({"VALIDADA", "APROBADA"})
+    if legacy:
+        approved = frame["estado_aprobacion"].eq("APROBADA")
     incomplete = approved & (
-        frame["responsable_aprobacion"].eq("")
-        | frame["fecha_aprobacion"].eq("")
-        | frame["evidencia_aprobacion"].eq("")
+        frame["approver_role"].eq("") | frame["approver_id"].eq("")
+        | frame["evidence_type"].eq("") | frame["evidence_reference"].eq("")
+        | frame["decision_date"].eq("") | frame["decision"].eq("")
+        | frame["validation_record_id"].eq("")
     )
+    if legacy:
+        incomplete = approved & (frame["responsable_aprobacion"].eq("") | frame["fecha_aprobacion"].eq("") | frame["evidencia_aprobacion"].eq(""))
     if incomplete.any():
         raise ValueError(
-            "Approved rules require responsible person, approval date and approval evidence."
+                "Validated rules require responsible person, role, evidence, decision and record traceability."
         )
     return frame
 
@@ -89,7 +117,7 @@ def apply_rule_ledger(
 
     result = registry.merge(approvals, on=RULE_KEY_COLUMNS, how="left", validate="one_to_one")
     for column in RULE_APPROVAL_COLUMNS[2:]:
-        result[column] = result[column].fillna("PENDIENTE" if column == "estado_aprobacion" else "")
+        result[column] = result[column].fillna("PENDIENTE" if column in {"estado_aprobacion", "validation_status"} else "")
     return result
 
 
@@ -97,6 +125,13 @@ def require_approved_financial_rules(rules: pd.DataFrame) -> None:
     """Raise when an active financial rule lacks a complete approval for its own version."""
     active_financial = rules["active"].astype(bool) & rules["financial"].astype(bool)
     valid = (
+        rules["validation_status"].eq("APROBADA")
+        & rules["approver_role"].ne("") & rules["approver_id"].ne("")
+        & rules["evidence_type"].ne("") & rules["evidence_reference"].ne("")
+        & rules["decision_date"].ne("") & rules["decision"].ne("")
+        & rules["validation_record_id"].ne("")
+    )
+    valid |= (
         rules["estado_aprobacion"].eq("APROBADA")
         & rules["responsable_aprobacion"].ne("")
         & rules["fecha_aprobacion"].ne("")
