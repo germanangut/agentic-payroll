@@ -143,6 +143,7 @@ def run_baseline(
         reviews,
         rules,
         absences,
+        set(config.get("review_continuity", {}).get("reusable_non_financial_rule_ids", [])),
     )
     results = {**employee_results, "social_security": social, **external_deductions}
     if overtime is not None:

@@ -35,6 +35,9 @@ rule_governance:
       active: true
       financial: false
 
+review_continuity:
+  reusable_non_financial_rule_ids: ["absence_evidence_vs_payroll"]
+
 payroll:
   sheet_name: "Hoja1"
   header_markers: ["EMPLEADO", "NOMBRE EMPLEADO"]
