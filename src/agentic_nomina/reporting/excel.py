@@ -353,6 +353,9 @@ def write_report(
         (rules if rules is not None else pd.DataFrame()).to_excel(
             writer, sheet_name="Reglas", index=False
         )
+        (rules if rules is not None else pd.DataFrame()).to_excel(
+            writer, sheet_name="Reglas_Validaciones", index=False
+        )
         if absences is not None:
             absences.to_excel(writer, sheet_name="Ausencias", index=False)
 

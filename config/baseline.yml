@@ -3,6 +3,11 @@ company:
   country: "CO"
 
 rule_governance:
+  authorization_matrix:
+    default:
+      validation_roles: ["PAYROLL_ANALYST"]
+      approval_roles: ["PAYROLL_OWNER"]
+      evidence_types: ["SYNTHETIC_RECORD"]
   registry:
     - rule_id: "social_security_baseline"
       rule_version: "1.0"

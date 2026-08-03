@@ -68,6 +68,14 @@ The overtime options and employee-loan report options are optional pairs: when o
 - Use `--require-approved-rules` to block the run unless every active financial rule has a complete `APROBADA` entry for its current version.
 - The existing `Revisiones` human-exception ledger remains independent and compatible.
 
+### Operational validation
+
+- Rule validations are version-specific and use `PENDIENTE`, `EN_VALIDACION`, `VALIDADA`, `APROBADA` or `RECHAZADA`.
+- `VALIDADA` is technical/operational evidence review; only a complete `APROBADA` record satisfies strict financial-rule mode.
+- New records require an auditable responsible id and role, evidence type/reference, explicit decision/date and validation record id. Legacy rows are read conservatively and never become approved implicitly.
+- `rule_governance.authorization_matrix` is a synthetic provisional policy. Real authorized roles and evidence types remain an operational acceptance requirement from payroll/accounting.
+- `Reglas` shows current rule-version state and `Reglas_Validaciones` exposes the exported audit trail; evidence documents remain external references only.
+
 ## Human review workflow
 
 - Every exception receives a deterministic `exception_id` based on its material facts.
