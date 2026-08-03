@@ -126,7 +126,13 @@ def _social_exceptions(social: pd.DataFrame) -> list[dict[str, object]]:
                     "source_file": None,
                     "source_sheet": None,
                     "source_row": None,
-                    "notes": f"source_match={record.get('source_match')}",
+                    "notes": (
+                        f"source_match={record.get('source_match')}; "
+                        f"control_id={record.get('contributed_days_control_id', '')}; "
+                        f"explanation={record.get('days_explanation_status', '')}; "
+                        f"reason={record.get('days_explanation_reason', '')}; "
+                        f"financial_effect={record.get('absence_financial_effect', False)}"
+                    ),
                 }
             )
     return rows
