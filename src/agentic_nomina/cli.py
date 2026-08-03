@@ -69,6 +69,14 @@ def reconcile(
             help="Previous reconciliation workbook or CSV with human review decisions.",
         ),
     ] = None,
+    rules: Annotated[
+        Path | None,
+        typer.Option(exists=True, help="Previous workbook or CSV with rule approvals."),
+    ] = None,
+    require_approved_rules: Annotated[
+        bool,
+        typer.Option("--require-approved-rules", help="Block runs with unapproved active financial rules."),
+    ] = False,
     output: Annotated[Path, typer.Option()] = Path("data/processed/reconciliation.xlsx"),
     config_path: Annotated[Path, typer.Option("--config")] = Path("config/baseline.yml"),
 ) -> None:
@@ -86,6 +94,8 @@ def reconcile(
         loans_q1_path=loans_q1,
         loans_q2_path=loans_q2,
         reviews_path=reviews,
+        rules_path=rules,
+        require_approved_rules=require_approved_rules,
         output_path=output,
         config=config,
     )

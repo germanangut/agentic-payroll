@@ -313,6 +313,7 @@ def write_report(
     external_deductions: dict[str, pd.DataFrame] | None = None,
     loans: pd.DataFrame | None = None,
     reviews: pd.DataFrame | None = None,
+    rules: pd.DataFrame | None = None,
 ) -> None:
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -340,6 +341,9 @@ def write_report(
         )
         exceptions.to_excel(writer, sheet_name="Excepciones", index=False)
         review_sheet(exceptions).to_excel(writer, sheet_name="Revisiones", index=False)
+        (rules if rules is not None else pd.DataFrame()).to_excel(
+            writer, sheet_name="Reglas", index=False
+        )
 
         for worksheet in writer.book.worksheets:
             worksheet.freeze_panes = "A2"
