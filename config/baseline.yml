@@ -2,6 +2,11 @@ company:
   name: "Empresa piloto"
   country: "CO"
 
+run_manifest:
+  schema_version: "1.0"
+  # El período productivo y la retención de metadatos requieren aceptación operativa.
+  operational_acceptance_pending: true
+
 rule_governance:
   authorization_matrix:
     default:

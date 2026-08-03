@@ -22,5 +22,9 @@ class ReconciliationSummary(BaseModel):
 
 class RunMetadata(BaseModel):
     company: str
-    period: str
+    period: str = "NO_ESPECIFICADO"
+    run_id: str
+    execution_timestamp: str
+    schema_version: str = "1.0"
     source_files: list[str] = Field(default_factory=list)
+    preflight_status: str = "OK"
