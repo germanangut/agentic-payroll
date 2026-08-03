@@ -6,6 +6,7 @@ from typing import Annotated
 import typer
 
 from agentic_nomina.config import load_config
+from agentic_nomina.demo import DEMO_NOTICE, run_demo
 from agentic_nomina.service import run_baseline
 
 app = typer.Typer(help="Agentic Nomina reconciliation baseline.")
@@ -119,6 +120,24 @@ def reconcile(
         typer.echo(f"Comfatolima employee controls: {len(results['comfatolima'])}")
     if "loans" in results:
         typer.echo(f"Employee-loan balance controls: {len(results['loans'])}")
+
+
+@app.command("demo")
+def demo(
+    output_dir: Annotated[Path, typer.Option("--output-dir", help="Directorio nuevo o vacío para artefactos sintéticos.")],
+    period: Annotated[str | None, typer.Option("--period", help="Período técnico sintético YYYY-MM.")] = None,
+    run_id: Annotated[str | None, typer.Option("--run-id", help="Identificador auditable opcional.")] = None,
+    config_path: Annotated[Path, typer.Option("--config")] = Path("config/baseline.yml"),
+) -> None:
+    """Ejecuta una demostración sintética con el servicio público real."""
+    try:
+        summary = run_demo(output_dir, period=period, run_id=run_id, config_path=config_path)
+    except ValueError as error:
+        raise typer.BadParameter(str(error)) from error
+    typer.echo(DEMO_NOTICE)
+    typer.echo(f"run_id: {summary['run_id']}")
+    typer.echo(f"Período: {summary['business_period']}; preflight: {summary['preflight_status']}")
+    typer.echo("Validación de libro: OK")
 
 
 if __name__ == "__main__":
