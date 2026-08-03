@@ -94,6 +94,13 @@ The overtime options and employee-loan report options are optional pairs: when o
 - A non-financial `FALSO_POSITIVO` may be reused only for a configured rule id, one complete exact precedent and no ambiguity.
 - Operational acceptance with a real second payroll month remains pending; synthetic two-period fixtures validate the technical continuity contract.
 
+## Días cotizados y ausencias
+
+- La diferencia observada es `días nómina - días de salud PILA`; sus valores fuente nunca se modifican.
+- La regla `absence_aware_contributed_days` sólo aporta una explicación provisional no financiera cuando una incapacidad sintética en días completos coincide exactamente y en la dirección configurada.
+- Horas, fracciones, solapamientos, períodos ambiguos, evidencia incompleta o coincidencias parciales permanecen en `REVIEW`; no se convierten horas a días.
+- La explicación no autoriza correcciones de PILA, pagos ni aportes. La definición real de tipos elegibles, jornada, festivos y distribución entre períodos sigue pendiente de nómina/contabilidad.
+
 ## Overtime rule semantics
 
 - Raw hours remain visible in the output.

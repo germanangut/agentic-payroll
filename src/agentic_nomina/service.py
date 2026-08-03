@@ -12,6 +12,7 @@ from agentic_nomina.adapters.loans import load_loan_balance_report
 from agentic_nomina.adapters.overtime import load_overtime_summary
 from agentic_nomina.adapters.payroll import load_payroll
 from agentic_nomina.adapters.pila import load_pila
+from agentic_nomina.reconciliation.absence_aware_days import explain_contributed_day_differences
 from agentic_nomina.reconciliation.absences import reconcile_absences
 from agentic_nomina.reconciliation.employees import reconcile_employees
 from agentic_nomina.reconciliation.external_deductions import reconcile_external_deduction
@@ -66,6 +67,9 @@ def run_baseline(
         evidence = pd.concat(
             [load_absence_evidence(path, config["absences"], "MONTH") for path in absence_evidence_paths],
             ignore_index=True,
+        )
+        social = explain_contributed_day_differences(
+            social, evidence, config["contributed_days_explanation"]
         )
         payroll_units = absence_payroll_units(pd.concat([payroll_q1, payroll_q2]), config["absences"])
         absences = reconcile_absences(evidence, payroll_units)

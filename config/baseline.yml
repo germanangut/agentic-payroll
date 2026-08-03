@@ -39,6 +39,11 @@ rule_governance:
       rule_name: "Evidencia de ausencias contra novedad liquidada"
       active: true
       financial: false
+    - rule_id: "absence_aware_contributed_days"
+      rule_version: "1.0"
+      rule_name: "Explicación provisional de diferencia de días cotizados"
+      active: true
+      financial: false
 
 review_continuity:
   reusable_non_financial_rule_ids: ["absence_evidence_vs_payroll"]
@@ -65,6 +70,14 @@ absences:
   payroll_units:
     INCAPACIDAD: "incapacity_units"
     PERMISO: "permission_units"
+
+contributed_days_explanation:
+  rule_id: "absence_aware_contributed_days"
+  rule_version: "1.0"
+  active: true
+  financial: false
+  absence_types: ["INCAPACIDAD"]
+  comparable_units: ["DAYS"]
 
 employee_list:
   sheet_name: "Hoja1"
