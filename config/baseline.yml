@@ -29,6 +29,11 @@ rule_governance:
       rule_name: "Movimiento de saldos de préstamos"
       active: true
       financial: true
+    - rule_id: "absence_evidence_vs_payroll"
+      rule_version: "1.0"
+      rule_name: "Evidencia de ausencias contra novedad liquidada"
+      active: true
+      financial: false
 
 payroll:
   sheet_name: "Hoja1"
@@ -45,6 +50,13 @@ payroll:
     los_olivos: "LOS OLIVOS SEGURO"
     comfatolima: "COMFATOLIMA PREST"
     loan: "PRESTAMOS Y/O ANT"
+    incapacity: "INCAPACIDAD"
+    permission: "PERMISO"
+
+absences:
+  payroll_units:
+    INCAPACIDAD: "incapacity_units"
+    PERMISO: "permission_units"
 
 employee_list:
   sheet_name: "Hoja1"

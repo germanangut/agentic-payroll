@@ -60,6 +60,8 @@ def load_payroll(path: str | Path, config: dict[str, Any], period_label: str) ->
         "overtime_day_hours": concepts.get("overtime_day", ""),
         "overtime_night_hours": concepts.get("overtime_night", ""),
         "night_surcharge_hours": concepts.get("night_surcharge", ""),
+        "incapacity_units": concepts.get("incapacity", ""),
+        "permission_units": concepts.get("permission", ""),
     }.items():
         value_col = _column_by_prefix(headers, configured) if configured else None
         if value_col and headers.index(value_col) > 0:

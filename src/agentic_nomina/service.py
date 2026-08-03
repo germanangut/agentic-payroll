@@ -5,12 +5,14 @@ from typing import Any
 
 import pandas as pd
 
+from agentic_nomina.adapters.absences import absence_payroll_units, load_absence_evidence
 from agentic_nomina.adapters.employees import load_employee_list
 from agentic_nomina.adapters.external_deductions import load_comfatolima, load_los_olivos
 from agentic_nomina.adapters.loans import load_loan_balance_report
 from agentic_nomina.adapters.overtime import load_overtime_summary
 from agentic_nomina.adapters.payroll import load_payroll
 from agentic_nomina.adapters.pila import load_pila
+from agentic_nomina.reconciliation.absences import reconcile_absences
 from agentic_nomina.reconciliation.employees import reconcile_employees
 from agentic_nomina.reconciliation.external_deductions import reconcile_external_deduction
 from agentic_nomina.reconciliation.loans import reconcile_loan_balances
@@ -44,6 +46,7 @@ def run_baseline(
     reviews_path: str | Path | None = None,
     rules_path: str | Path | None = None,
     require_approved_rules: bool = False,
+    absence_evidence_paths: list[str | Path] | None = None,
 ) -> dict[str, pd.DataFrame]:
     payroll_q1 = load_payroll(payroll_q1_path, config["payroll"], "Q1")
     payroll_q2 = load_payroll(payroll_q2_path, config["payroll"], "Q2")
@@ -58,6 +61,14 @@ def run_baseline(
     social = reconcile_social_security(
         [payroll_q1, payroll_q2], pila, config["reconciliation"]
     )
+    absences: pd.DataFrame | None = None
+    if absence_evidence_paths:
+        evidence = pd.concat(
+            [load_absence_evidence(path, config["absences"], "MONTH") for path in absence_evidence_paths],
+            ignore_index=True,
+        )
+        payroll_units = absence_payroll_units(pd.concat([payroll_q1, payroll_q2]), config["absences"])
+        absences = reconcile_absences(evidence, payroll_units)
 
     overtime: pd.DataFrame | None = None
     if (overtime_q1_path is None) != (overtime_q2_path is None):
@@ -131,10 +142,13 @@ def run_baseline(
         loans,
         reviews,
         rules,
+        absences,
     )
     results = {**employee_results, "social_security": social, **external_deductions}
     if overtime is not None:
         results["overtime"] = overtime
     if loans is not None:
         results["loans"] = loans
+    if absences is not None:
+        results["absences"] = absences
     return results

@@ -4,7 +4,7 @@ from collections.abc import Iterable
 
 import pandas as pd
 
-_SEVERITY_RANK = {"OK": 0, "WARNING": 1, "REVIEW": 2, "BLOCKING": 3}
+_SEVERITY_RANK = {"OK": 0, "WARNING": 1, "REVIEW": 2, "EXCEPTION": 3, "BLOCKING": 3}
 
 
 def _value(record: dict[str, object], *columns: str) -> object:
@@ -95,6 +95,7 @@ def build_employee_case_file(
     overtime: pd.DataFrame | None = None,
     external_deductions: dict[str, pd.DataFrame] | None = None,
     loans: pd.DataFrame | None = None,
+    absences: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """Build one auditable summary row per employee across every enabled control."""
     rows = [*_employee_controls(employee_results), *_social_controls(social)]
@@ -118,6 +119,8 @@ def build_employee_case_file(
                 control="balance_movement",
             )
         )
+    if absences is not None:
+        rows.extend(_single_controls([absences], module_column="", default_module="ABSENCES", control="reported_vs_paid"))
 
     columns = [
         "employee_id",
